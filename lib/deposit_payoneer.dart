@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'Model/Server.dart';
+
 class PayoneerScreen extends StatefulWidget {
 
   @override
@@ -260,8 +262,12 @@ class _PayoneerScreenState extends State<PayoneerScreen> {
                                                                   MaterialButton(
                                                                     //minWidth: double.infinity,
                                                                     //height: 50,
-                                                                    onPressed: () {
+                                                                    onPressed: () async{
                                                                       //navigationPage();
+                                                                      await StripeService.payWithNewCard(
+                                                                          amount: '15000',
+                                                                          currency: 'USD'
+                                                                      );
                                                                     },
                                                                     color: Colors.white,
                                                                     elevation: 8,
@@ -306,5 +312,11 @@ class _PayoneerScreenState extends State<PayoneerScreen> {
           ),
         )
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    StripeService.init();
   }
 }

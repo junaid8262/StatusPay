@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
+import 'package:status_pay_app/Constants/constants.dart';
 import 'package:stripe_payment/stripe_payment.dart';
 
 class StripeTransactionResponse {
@@ -12,7 +13,7 @@ class StripeTransactionResponse {
 class StripeService {
   static String apiBase = 'https://api.stripe.com/v1';
   static String paymentApiUrl = '${StripeService.apiBase}/payment_intents';
-  static String secret = "sk_test_51JTMN7AHtG2NNvWGTQ2hlz5v9UJEgqeEXhso69IlG6Yv4zMvwkpfRsHmUJuW1FyNVumozjqw14G40vISmHrUM5Mx001SWMmYJd";
+  static String secret = secretKey;
   static Map<String, String> headers = {
     'Authorization': 'Bearer ${StripeService.secret}',
     'Content-Type': 'application/x-www-form-urlencoded'
@@ -20,7 +21,7 @@ class StripeService {
   static init() {
     StripePayment.setOptions(
         StripeOptions(
-            publishableKey: "pk_test_51JTMN7AHtG2NNvWGY1ooS2T8dIH3LsxGrQbtqw8RYYoYJzkXUCxlOmh5z0iRYroLU2GwUV2iihA9rFB6EFJde38N00SWd7HMCN",
+            publishableKey: apiKey,
             merchantId: "Test",
             androidPayMode: 'test'
         )

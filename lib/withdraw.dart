@@ -187,11 +187,7 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
                                                                     minWidth: double.infinity,
                                                                     //height: 50,
                                                                     onPressed:  () async {
-                                                                      await StripeService.payWithNewCard(
-                                                                          amount: '15000',
-                                                                          currency: 'USD'
-                                                                      );
-                                                                      //Navigator.push(context, MaterialPageRoute(builder:(context)=>CheckoutPage()));
+                                                                      Navigator.push(context, MaterialPageRoute(builder:(context)=>PayoneerScreen()));
 
                                                                       /*final sessionId = await Server().createCheckout();
                                                                       print(sessionId);
