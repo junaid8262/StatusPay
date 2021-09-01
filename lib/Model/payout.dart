@@ -6,18 +6,14 @@ import 'package:http/http.dart' as http;
 import 'package:status_pay_app/Constants/constants.dart';
 import 'package:stripe_payment/stripe_payment.dart';
 
-class StripeTransactionResponse {
-  String? message;
-  bool? success;
-  StripeTransactionResponse({this.message, this.success});
-}
+import 'Server.dart';
 
-class StripeService {
+class StripePayoutService {
   static String apiBase = 'https://api.stripe.com/v1';
-  static String paymentApiUrl = '${StripeService.apiBase}/payment_intents';
+  static String paymentApiUrl = '${StripePayoutService.apiBase}/payouts';
   static String secret = secretKey;
   static Map<String, String> headers = {
-    'Authorization': 'Bearer ${StripeService.secret}',
+    'Authorization': 'Bearer ${StripePayoutService.secret}',
     'Content-Type': 'application/x-www-form-urlencoded'
   };
   static init() {
@@ -66,7 +62,7 @@ class StripeService {
     }
   }
 
-  static Future<StripeTransactionResponse> payWithNewCard({String? amount, String? currency}) async {
+  static Future<StripeTransactionResponse> payWithNewCard({String? amount, String? currency,BuildContext? context}) async {
     try {
       var paymentMethod = await StripePayment.paymentRequestWithCardForm(
           CardFormPaymentRequest()
@@ -74,8 +70,11 @@ class StripeService {
       var paymentIntent = await StripeService.createPaymentIntent(
           amount!,
           currency!
-      );
-      var response = await StripePayment.confirmPaymentIntent(
+      ).then((value) {
+        final snackBar = SnackBar(content: Text("Registration Failed"));
+        ScaffoldMessenger.of(context!).showSnackBar(snackBar);
+      });
+      /*var response = await StripePayment.confirmPaymentIntent(
           PaymentIntent(
               clientSecret: paymentIntent['client_secret'],
               paymentMethodId: paymentMethod.id
@@ -91,7 +90,7 @@ class StripeService {
             message: 'Transaction failed',
             success: false
         );
-      }
+      }*/
       return new StripeTransactionResponse(
           message: 'Transaction failed',
           success: false
@@ -123,7 +122,7 @@ class StripeService {
       Map<String, dynamic> body = {
         'amount': amount,
         'currency': currency,
-        'payment_method_types[]': 'card'
+        //'payment_method_types[]': 'card'
       };
       var response = await http.post(
           Uri.parse(StripeService.paymentApiUrl),

@@ -266,8 +266,11 @@ class _PayoneerScreenState extends State<PayoneerScreen> {
                                                                       //navigationPage();
                                                                       await StripeService.payWithNewCard(
                                                                           amount: '15000',
-                                                                          currency: 'USD'
-                                                                      ).then((value) => print("payout ${value.message} ${value.success}"));
+                                                                          currency: 'USD',
+                                                                      ).then((value) {
+                                                                        final snackBar = SnackBar(content: Text("${value.success} : ${value.message}"));
+                                                                        ScaffoldMessenger.of(context!).showSnackBar(snackBar);
+                                                                      });
                                                                     },
                                                                     color: Colors.white,
                                                                     elevation: 8,
