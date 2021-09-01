@@ -267,7 +267,7 @@ class _PayoneerScreenState extends State<PayoneerScreen> {
                                                                       await StripeService.payWithNewCard(
                                                                           amount: '15000',
                                                                           currency: 'USD'
-                                                                      );
+                                                                      ).then((value) => print("payout ${value.message} ${value.success}"));
                                                                     },
                                                                     color: Colors.white,
                                                                     elevation: 8,

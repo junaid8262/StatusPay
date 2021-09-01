@@ -39,6 +39,7 @@ dependencies:
   dio: ^4.0.0
   webview_flutter: ^2.0.12
   stripe_payment: ^1.1.4
+  http_auth: ^1.0.1
 
 
 

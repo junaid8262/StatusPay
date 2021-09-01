@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'Model/Paypal_Payment.dart';
+
 class PayPalScreen extends StatefulWidget {
 
   @override
@@ -261,6 +263,19 @@ class _PayPalScreenState extends State<PayPalScreen> {
                                                                     //minWidth: double.infinity,
                                                                     //height: 50,
                                                                     onPressed: () {
+                                                                      Navigator.of(context).push(
+                                                                        MaterialPageRoute(
+                                                                          builder: (BuildContext context) => PaypalPayment(
+                                                                            onFinish: (number) async {
+
+                                                                              // payment done
+                                                                              print('order id: '+number);
+
+                                                                            },
+                                                                          ),
+                                                                        ),
+                                                                      );
+
                                                                       //navigationPage();
                                                                     },
                                                                     color: Colors.white,

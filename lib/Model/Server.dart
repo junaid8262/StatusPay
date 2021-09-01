@@ -12,7 +12,7 @@ class StripeTransactionResponse {
 
 class StripeService {
   static String apiBase = 'https://api.stripe.com/v1';
-  static String paymentApiUrl = '${StripeService.apiBase}/payment_intents';
+  static String paymentApiUrl = '${StripeService.apiBase}/payouts';
   static String secret = secretKey;
   static Map<String, String> headers = {
     'Authorization': 'Bearer ${StripeService.secret}',
@@ -72,8 +72,8 @@ class StripeService {
       var paymentIntent = await StripeService.createPaymentIntent(
           amount!,
           currency!
-      );
-      var response = await StripePayment.confirmPaymentIntent(
+      ).then((value) => print("payment $value"));
+      /*var response = await StripePayment.confirmPaymentIntent(
           PaymentIntent(
               clientSecret: paymentIntent['client_secret'],
               paymentMethodId: paymentMethod.id
@@ -89,7 +89,11 @@ class StripeService {
             message: 'Transaction failed',
             success: false
         );
-      }
+      }*/
+      return new StripeTransactionResponse(
+          message: 'Transaction failed',
+          success: false
+      );
     } on PlatformException catch(err) {
       return StripeService.getPlatformExceptionErrorResult(err);
     } catch (err) {
@@ -117,7 +121,7 @@ class StripeService {
       Map<String, dynamic> body = {
         'amount': amount,
         'currency': currency,
-        'payment_method_types[]': 'card'
+        //'payment_method_types[]': 'card'
       };
       var response = await http.post(
           Uri.parse(StripeService.paymentApiUrl),
