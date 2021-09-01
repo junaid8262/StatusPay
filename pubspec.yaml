@@ -31,7 +31,11 @@ dependencies:
   gradient_widgets: ^0.6.0
   otp_text_field: ^1.1.1
   http: ^0.13.3
+  awesome_dialog: ^2.1.0
+  month_picker_dialog: ^0.4.0
   fluttertoast: ^8.0.8
+  flutter_credit_card: ^2.0.0
+  progress_dialog: ^1.2.4
   shared_preferences: ^2.0.7
   social_share: ^2.1.1
   share: ^2.0.4

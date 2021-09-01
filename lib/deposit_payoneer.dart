@@ -1,7 +1,10 @@
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
-
+import 'package:month_picker_dialog/month_picker_dialog.dart';
+import 'package:status_pay_app/withdraw.dart';
+import 'package:stripe_payment/stripe_payment.dart';
 import 'Model/Server.dart';
-
+import 'package:progress_dialog/progress_dialog.dart';
 class PayoneerScreen extends StatefulWidget {
 
   @override
@@ -9,6 +12,60 @@ class PayoneerScreen extends StatefulWidget {
 }
 
 class _PayoneerScreenState extends State<PayoneerScreen> {
+  var cardController=TextEditingController();
+  var expireController=TextEditingController();
+  var cvvController=TextEditingController();
+  int month=00;
+  int year=00;
+  payViaExistingCard(BuildContext context,String amount,String number,int exMonth,int exYear,String cvv) async {
+    ProgressDialog dialog = new ProgressDialog(context);
+    dialog.style(
+        message: 'Please wait...'
+    );
+    await dialog.show();
+
+    //var expiryArr = card['expiryDate'].split('/');
+    CreditCard stripeCard = CreditCard(
+      number: number,
+      expMonth: exMonth,
+      expYear: exYear,
+      cvc: cvv,
+
+    );
+    var response = await StripeService.payViaExistingCard(
+        amount: amount,
+        currency: 'AED',
+        card: stripeCard
+    );
+    await dialog.hide();
+    print("respones : ${response.message}");
+    if(response.success!){
+      AwesomeDialog(
+        context: context,
+        dialogType: DialogType.SUCCES,
+        animType: AnimType.BOTTOMSLIDE,
+        title: 'Success',
+        desc: '${response.message.toString()}',
+        btnOkOnPress: () {
+          Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => PayoneerScreen()));
+        },
+      )..show();
+    }
+    else{
+      AwesomeDialog(
+        context: context,
+        dialogType: DialogType.ERROR,
+        animType: AnimType.BOTTOMSLIDE,
+        title: 'Error',
+        desc: '${response.message.toString()}',
+        btnOkOnPress: () {
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => PayoneerScreen()));
+        },
+      )..show();
+
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -156,41 +213,42 @@ class _PayoneerScreenState extends State<PayoneerScreen> {
                                                                     textAlign: TextAlign.left,
                                                                   ),
                                                                   SizedBox(height: 40,),
-                                                                  MaterialButton(
-                                                                    minWidth: double.infinity,
-                                                                    //height: 50,
-                                                                    onPressed: () {
-                                                                      //navigationPage();
+                                                                  TextFormField(
+                                                                    controller: cardController,
+                                                                    validator: (value) {
+                                                                      if (value == null || value.isEmpty) {
+                                                                        return 'Please enter some text';
+                                                                      }
+                                                                      return null;
                                                                     },
-                                                                    color: Colors.white,
-                                                                    elevation: 8,
-                                                                    shape: RoundedRectangleBorder(
-                                                                      borderRadius: BorderRadius.circular(10),
-
-                                                                    ),
-                                                                    child: Text(
-                                                                      "Card Holder", style: TextStyle(fontSize: 18,fontWeight: FontWeight.w400,color: Colors.red[300],
-                                                                    ),
-                                                                      textAlign: TextAlign.center,
-                                                                    ),
-                                                                  ),
-                                                                  SizedBox(height: 10,),
-                                                                  MaterialButton(
-                                                                    minWidth: double.infinity,
-                                                                    //height: 50,
-                                                                    onPressed: () {
-                                                                      //navigationPage();
-                                                                    },
-                                                                    color: Colors.white,
-                                                                    elevation: 8,
-                                                                    shape: RoundedRectangleBorder(
-                                                                      borderRadius: BorderRadius.circular(10),
-
-                                                                    ),
-                                                                    child: Text(
-                                                                      "Number", style: TextStyle(fontSize: 18,fontWeight: FontWeight.w400,color: Colors.red[300],
-                                                                    ),
-                                                                      textAlign: TextAlign.center,
+                                                                    decoration: InputDecoration(
+                                                                      contentPadding: EdgeInsets.all(15),
+                                                                      focusedBorder: OutlineInputBorder(
+                                                                        borderRadius: BorderRadius.circular(7.0),
+                                                                        borderSide: BorderSide(
+                                                                          color: Colors.transparent,
+                                                                        ),
+                                                                      ),
+                                                                      enabledBorder: OutlineInputBorder(
+                                                                        borderRadius: BorderRadius.circular(7.0),
+                                                                        borderSide: BorderSide(
+                                                                            color: Colors.transparent,
+                                                                            width: 0.5
+                                                                        ),
+                                                                      ),
+                                                                      border: OutlineInputBorder(
+                                                                        borderRadius: BorderRadius.circular(7.0),
+                                                                        borderSide: BorderSide(
+                                                                          color: Colors.transparent,
+                                                                          width: 0.5,
+                                                                        ),
+                                                                      ),
+                                                                      filled: true,
+                                                                      fillColor: Colors.white,
+                                                                      hintText: "Card Number",
+                                                                      // If  you are using latest version of flutter then lable text and hint text shown like this
+                                                                      // if you r using flutter less then 1.20.* then maybe this is not working properly
+                                                                      floatingLabelBehavior: FloatingLabelBehavior.always,
                                                                     ),
                                                                   ),
                                                                   SizedBox(height: 10,),
@@ -204,22 +262,59 @@ class _PayoneerScreenState extends State<PayoneerScreen> {
                                                                             child: Column(
                                                                                 crossAxisAlignment: CrossAxisAlignment.center,
                                                                                 children: [
-                                                                                  MaterialButton(
-                                                                                    minWidth: double.infinity,
-                                                                                    //height: 50,
-                                                                                    onPressed: () {
-                                                                                      //navigationPage();
+                                                                                  TextFormField(
+                                                                                    controller: expireController,
+                                                                                    readOnly: true,
+                                                                                    onTap: (){
+                                                                                      showMonthPicker(
+                                                                                        context: context,
+                                                                                        firstDate: DateTime(DateTime.now().year - 1, 5),
+                                                                                        lastDate: DateTime(DateTime.now().year + 1, 9),
+                                                                                        initialDate: DateTime.now(),
+                                                                                      ).then((date) {
+                                                                                        if (date != null) {
+                                                                                          setState(() {
+                                                                                            month=date.month;
+                                                                                            year=date.year;
+                                                                                            expireController.text="$month/${year.toString()[2]}${year.toString()[3]}";
+                                                                                          });
+                                                                                        }
+                                                                                      });
                                                                                     },
-                                                                                    color: Colors.white,
-                                                                                    elevation: 8,
-                                                                                    shape: RoundedRectangleBorder(
-                                                                                      borderRadius: BorderRadius.circular(10),
-
-                                                                                    ),
-                                                                                    child: Text(
-                                                                                      "Expires", style: TextStyle(fontSize: 18,fontWeight: FontWeight.w400,color: Colors.red[300],
-                                                                                    ),
-                                                                                      textAlign: TextAlign.center,
+                                                                                    validator: (value) {
+                                                                                      if (value == null || value.isEmpty) {
+                                                                                        return 'Please enter some text';
+                                                                                      }
+                                                                                      return null;
+                                                                                    },
+                                                                                    decoration: InputDecoration(
+                                                                                      contentPadding: EdgeInsets.all(15),
+                                                                                      focusedBorder: OutlineInputBorder(
+                                                                                        borderRadius: BorderRadius.circular(7.0),
+                                                                                        borderSide: BorderSide(
+                                                                                          color: Colors.transparent,
+                                                                                        ),
+                                                                                      ),
+                                                                                      enabledBorder: OutlineInputBorder(
+                                                                                        borderRadius: BorderRadius.circular(7.0),
+                                                                                        borderSide: BorderSide(
+                                                                                            color: Colors.transparent,
+                                                                                            width: 0.5
+                                                                                        ),
+                                                                                      ),
+                                                                                      border: OutlineInputBorder(
+                                                                                        borderRadius: BorderRadius.circular(7.0),
+                                                                                        borderSide: BorderSide(
+                                                                                          color: Colors.transparent,
+                                                                                          width: 0.5,
+                                                                                        ),
+                                                                                      ),
+                                                                                      filled: true,
+                                                                                      fillColor: Colors.white,
+                                                                                      hintText: "Expire Date",
+                                                                                      // If  you are using latest version of flutter then lable text and hint text shown like this
+                                                                                      // if you r using flutter less then 1.20.* then maybe this is not working properly
+                                                                                      floatingLabelBehavior: FloatingLabelBehavior.always,
                                                                                     ),
                                                                                   ),
                                                                                   SizedBox(height: 5,),
@@ -233,22 +328,43 @@ class _PayoneerScreenState extends State<PayoneerScreen> {
                                                                         child: Column(
                                                                           crossAxisAlignment: CrossAxisAlignment.center,
                                                                           children: [
-                                                                            MaterialButton(
-                                                                              minWidth: double.infinity,
-                                                                              //height: 50,
-                                                                              onPressed: () {
-                                                                                //navigationPage();
+                                                                            TextFormField(
+                                                                              controller: cvvController,
+                                                                              keyboardType: TextInputType.number,
+                                                                              validator: (value) {
+                                                                                if (value == null || value.isEmpty) {
+                                                                                  return 'Please enter some text';
+                                                                                }
+                                                                                return null;
                                                                               },
-                                                                              color: Colors.white,
-                                                                              elevation: 8,
-                                                                              shape: RoundedRectangleBorder(
-                                                                                borderRadius: BorderRadius.circular(10),
-
-                                                                              ),
-                                                                              child: Text(
-                                                                                "CVV", style: TextStyle(fontSize: 18,fontWeight: FontWeight.w400,color: Colors.red[300],
-                                                                              ),
-                                                                                textAlign: TextAlign.center,
+                                                                              decoration: InputDecoration(
+                                                                                contentPadding: EdgeInsets.all(15),
+                                                                                focusedBorder: OutlineInputBorder(
+                                                                                  borderRadius: BorderRadius.circular(7.0),
+                                                                                  borderSide: BorderSide(
+                                                                                    color: Colors.transparent,
+                                                                                  ),
+                                                                                ),
+                                                                                enabledBorder: OutlineInputBorder(
+                                                                                  borderRadius: BorderRadius.circular(7.0),
+                                                                                  borderSide: BorderSide(
+                                                                                      color: Colors.transparent,
+                                                                                      width: 0.5
+                                                                                  ),
+                                                                                ),
+                                                                                border: OutlineInputBorder(
+                                                                                  borderRadius: BorderRadius.circular(7.0),
+                                                                                  borderSide: BorderSide(
+                                                                                    color: Colors.transparent,
+                                                                                    width: 0.5,
+                                                                                  ),
+                                                                                ),
+                                                                                filled: true,
+                                                                                fillColor: Colors.white,
+                                                                                hintText: "Card CVV",
+                                                                                // If  you are using latest version of flutter then lable text and hint text shown like this
+                                                                                // if you r using flutter less then 1.20.* then maybe this is not working properly
+                                                                                floatingLabelBehavior: FloatingLabelBehavior.always,
                                                                               ),
                                                                             ),
                                                                             SizedBox(height: 5,),
@@ -264,13 +380,8 @@ class _PayoneerScreenState extends State<PayoneerScreen> {
                                                                     //height: 50,
                                                                     onPressed: () async{
                                                                       //navigationPage();
-                                                                      await StripeService.payWithNewCard(
-                                                                          amount: '15000',
-                                                                          currency: 'USD',
-                                                                      ).then((value) {
-                                                                        final snackBar = SnackBar(content: Text("${value.success} : ${value.message}"));
-                                                                        ScaffoldMessenger.of(context!).showSnackBar(snackBar);
-                                                                      });
+                                                                      payViaExistingCard(context, '500', cardController.text.trim(), month, year, cvvController.text);
+
                                                                     },
                                                                     color: Colors.white,
                                                                     elevation: 8,
