@@ -4,7 +4,7 @@ import 'package:status_pay_app/Model/user.dart';
 import 'package:status_pay_app/submit_screenshot.dart';
 
 class Home extends StatefulWidget {
-  User user ;
+  UserModel user ;
 
   Home(this.user);
 
@@ -64,7 +64,7 @@ class _HomeState extends State<Home> {
                             ),
                             SizedBox(height: 4,),
                             Text(
-                              widget.user.userName,
+                              widget.user.fullName,
                               style: TextStyle(fontSize: 17,fontWeight: FontWeight.w400,color: Colors.black),
                               textAlign: TextAlign.center,
                             )

@@ -9,7 +9,7 @@ import 'package:status_pay_app/bottom_nav_screens/setting.dart';
 
 class BottomBar extends StatefulWidget {
   String uid;
-  User user ;
+  UserModel user ;
   bool isLogin;
 
   BottomBar(this.user,this.uid,this.isLogin);

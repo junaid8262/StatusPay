@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:status_pay_app/login.dart';
@@ -191,7 +192,7 @@ class _SettingState extends State<Setting> {
                                           //action
                                           SharedPref pf = SharedPref();
                                           pf.setLoggedIn(false);
-                                          Navigator.pushReplacement(context, MaterialPageRoute(builder:(context)=>LoginScreen()));
+                                          signOut().whenComplete(() =>Navigator.pushReplacement(context, MaterialPageRoute(builder:(context)=>LoginScreen())) );
                                         },
                                         child: Text("Log Out", style: TextStyle(
                                           color: Colors.blueAccent,
@@ -221,5 +222,8 @@ class _SettingState extends State<Setting> {
           ),
         )
     );
+  }
+  Future<void> signOut() async {
+    await FirebaseAuth.instance.signOut();
   }
 }

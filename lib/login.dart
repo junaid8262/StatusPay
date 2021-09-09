@@ -1,5 +1,8 @@
 import 'dart:convert';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:progress_dialog/progress_dialog.dart';
 import 'package:status_pay_app/Model/user.dart';
 import 'package:status_pay_app/forgot_password.dart';
 import 'package:status_pay_app/navigation/bottom_navigation.dart';
@@ -17,9 +20,10 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
 
   final _formKey = GlobalKey<FormState>();
-  TextEditingController username = TextEditingController();
+  TextEditingController email = TextEditingController();
   TextEditingController password = TextEditingController();
 
+/*
   Future login() async {
     var url = "$baseUrl/getUserData.php";
     var response = await http.post(Uri.parse(url), body: {
@@ -55,6 +59,7 @@ class _LoginScreenState extends State<LoginScreen> {
     }
     return response;
   }
+*/
 
   @override
   Widget build(BuildContext context) {
@@ -105,7 +110,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     padding: EdgeInsets.symmetric(horizontal: 40),
                     child: Column(
                       children: <Widget>[
-                        inputFile(label: "UserName",controller: username),
+                        inputFile(label: "UserName",controller: email),
                         inputFile(label: "Password",controller: password, obscureText: true),
                         SizedBox(
                           height: 5,
@@ -140,7 +145,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         onPressed: () {
                           if (_formKey.currentState!.validate())
                             {
-                              login();
+                              Login();
                             }
 
                         },
@@ -195,6 +200,82 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
+  // registering email and password
+  Future<void> Login() async {
+    UserCredential userCredential;
+    ProgressDialog pr;
+    pr = ProgressDialog(context);
+    try {
+      pr.style(
+        message: 'Please Wait...',
+        progressWidget: CircularProgressIndicator(
+          valueColor: new AlwaysStoppedAnimation<Color>(Colors.blueAccent),
+        ),
+      );
+      pr.show();
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email.text.trim(),
+        password: password.text.trim(),
+      ).then((value) {
+        pr.hide();
+        userCredential = value;
+        CollectionReference users = FirebaseFirestore.instance.collection('userDetail');
+        User? user=FirebaseAuth.instance.currentUser;
+        FirebaseFirestore.instance.collection('userDetail').doc(user!.uid)
+            .get().then((DocumentSnapshot documentSnapshot) {
+              pr.hide();
+
+            if (documentSnapshot.exists) {
+              Map<String, dynamic> data = documentSnapshot.data() as Map<String, dynamic>;
+              UserModel model= UserModel.fromMap(data, documentSnapshot.reference.id);
+              Navigator.pushReplacement(context, MaterialPageRoute(builder : (context)=> BottomBar(model ,user.uid ,true)));
+
+
+        }
+          });
+        }
+      );
+
+    } on FirebaseAuthException catch (e) {
+      print(e.code);
+      // user no found error code firebase
+      if (e.code == 'user-not-found') {
+        pr.hide();
+        Scaffold.of(context).showSnackBar(SnackBar(
+          duration: Duration(seconds: 2),
+          backgroundColor: Colors.blueAccent,
+          content: Text(
+            "User Not Found",
+          ),
+        ));
+      }
+
+      if (e.code == 'wrong-password') {
+        pr.hide();
+        Scaffold.of(context).showSnackBar(SnackBar(
+          duration: Duration(seconds: 2),
+          backgroundColor: Colors.blueAccent,
+          content: Text(
+            "Wrong Password",
+          ),
+        ));
+      }
+
+      if (e.code == 'network-request-failed') {
+        pr.hide();
+        Scaffold.of(context).showSnackBar(SnackBar(
+          duration: Duration(seconds: 2),
+          backgroundColor: Color(0xFF6F35A5),
+          content: Text(
+            "No Network",
+          ),
+        ));
+      }
+    }
+
+  }//login function
+
+
 }
 
 
@@ -242,4 +323,8 @@ Widget inputFile({label, controller,obscureText = false})
       SizedBox(height: 10,)
     ],
   );
+
+
+
+
 }

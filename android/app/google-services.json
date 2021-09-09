@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "388480984895",
+    "project_id": "status-pay-89e50",
+    "storage_bucket": "status-pay-89e50.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:388480984895:android:d7840f2e4c5c270cf3558a",
+        "android_client_info": {
+          "package_name": "com.example.status_pay_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "388480984895-f7eo5ta3jr7o977fslicdkqcdvof0i2a.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD1Lzs0vZwKOGlFMxj8CwKsWgkoD7l_MgY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "388480984895-f7eo5ta3jr7o977fslicdkqcdvof0i2a.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

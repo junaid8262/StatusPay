@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:ui';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:status_pay_app/login.dart';
 import 'package:status_pay_app/navigation/bottom_navigation.dart';
@@ -46,9 +48,18 @@ class _SplashScreenState extends State<SplashScreen>{
           if (value)
             {
               sp.getUserData().then((value) {
-                Iterable blog = json.decode(value);
-                var users=blog.map((blog) => new User.fromJson(blog)).toList();
-                Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => BottomBar(users[0], users[0].id, true)));
+                CollectionReference users = FirebaseFirestore.instance.collection('userDetail');
+                User? user=FirebaseAuth.instance.currentUser;
+                FirebaseFirestore.instance.collection('userDetail').doc(user!.uid)
+                    .get().then((DocumentSnapshot documentSnapshot) {
+
+                  if (documentSnapshot.exists) {
+                    Map<String, dynamic> data = documentSnapshot.data() as Map<String, dynamic>;
+                    UserModel model= UserModel.fromMap(data, documentSnapshot.reference.id);
+                    Navigator.pushReplacement(context, MaterialPageRoute(builder : (context)=> BottomBar(model ,user.uid ,true)));
+
+                  }
+                });
               });
             }
           else

@@ -263,7 +263,7 @@ class _PayPalScreenState extends State<PayPalScreen> {
                                                                     //minWidth: double.infinity,
                                                                     //height: 50,
                                                                     onPressed: () {
-                                                                      Navigator.of(context).push(
+                                                                      /*Navigator.of(context).push(
                                                                         MaterialPageRoute(
                                                                           builder: (BuildContext context) => PaypalPayment(
                                                                             onFinish: (number) async {
@@ -275,7 +275,7 @@ class _PayPalScreenState extends State<PayPalScreen> {
                                                                           ),
                                                                         ),
                                                                       );
-
+*/
                                                                       //navigationPage();
                                                                     },
                                                                     color: Colors.white,
